@@ -3,15 +3,23 @@
 namespace StringUtils{
 
 std::string Slice(const std::string &str, ssize_t start, ssize_t end) noexcept {
+    // initial negatives
+    if (start < 0) {
+        start += str.length();
+    }
+    if (end < 0) {
+        end += str.length();
+    }
+    //if end = 0 set to str length
+    if(end == 0){
+        end = str.length();
+    }
 
-    //if start negative, set to 0
+    //if still negative, set to 0
     if(start < 0){
         start = 0;
     }
-    //if end < 0
-    if(end < 0){
-        end = 0;
-    }
+    
 
     //if end is greater than string length, set to string length
     if(end > str.length()){
@@ -174,18 +182,29 @@ std::string Replace(const std::string &str, const std::string &old, const std::s
 }
 
 std::vector<std::string> Split(const std::string &str, const std::string &splt) noexcept {
+    //to store substrings
     std::vector<std::string> ret;
+
+    //start of substring
     size_t left = 0;
-    // index of first splt
+
+    //finds index of first splt
     size_t right = str.find(splt);
 
-    while(right < str.length()){
+    //while splt is found
+    while(right != std::string::npos){
+        //add substring to ret
         ret.push_back(str.substr(left, right - left));
+
+        //move to next character after splt found
         left = right + splt.length();
+
+        //finds next splt
         right = str.find(splt, left);
     }
-
-    ret.push_back(str.substr(left, right - left));
+    
+    //add last substring
+    ret.push_back(str.substr(left));
     return ret;
 }
 
@@ -207,16 +226,21 @@ std::string Join(const std::string &str, const std::vector<std::string> &vect) n
 }
 
 std::string ExpandTabs(const std::string &str, int tabsize) noexcept {
-    //splits string by tab in vector
-    std::vector<std::string> v = Split(str, "\t");
     std::string ret;
+    int tabstop = 0;
 
     //goes through vector and appends to string
-    for(size_t i = 0; i < v.size(); ++i){
-        ret += v[i];
-        //if not last string, add tabsize many spaces
-        if(i != v.size() - 1){
-            ret += std::string(tabsize, ' ');
+    for(size_t i = 0; i < str.size(); ++i){
+        char c = str[i];
+        if(c == '\t'){
+           int spaces = tabsize - (tabstop % tabsize);
+           ret += std::string(spaces, ' ');
+           tabstop += spaces; 
+        }
+
+        else{
+            ret += c;
+            tabstop++;
         }
     }
 

@@ -97,6 +97,9 @@ TEST(StringUtilsTest, Split){
     EXPECT_EQ(StringUtils::Split("pls gtest work", " "), (std::vector<std::string>{"pls", "gtest", "work"}));
     EXPECT_EQ(StringUtils::Split("pls gtest work", "t"), (std::vector<std::string>{"pls g", "es", " work"}));
     EXPECT_EQ(StringUtils::Split("pls gtest work", "AHAW"), (std::vector<std::string>{"pls gtest work"}));
+	std::vector<std::string> expected = {"A", "tougher", "test", "to", "pass!"};
+    EXPECT_EQ(StringUtils::Split("A\ntougher\ntest\nto\npass!", "\n"), expected);
+
 }
 
 TEST(StringUtilsTest, Join){
@@ -108,8 +111,8 @@ TEST(StringUtilsTest, Join){
 }
 
 TEST(StringUtilsTest, ExpandTabs){
-    EXPECT_EQ(StringUtils::ExpandTabs("pls\tgtest\twork", 2), "pls  gtest  work");
-    EXPECT_EQ(StringUtils::ExpandTabs("", 4), "");
+	EXPECT_EQ(StringUtils::ExpandTabs("A\tB\tC", 4), "A   B   C");
+    EXPECT_EQ(StringUtils::ExpandTabs("A\tB\tC", 8), "A       B       C");
 }
 
 TEST(StringUtilsTest, EditDistance){
