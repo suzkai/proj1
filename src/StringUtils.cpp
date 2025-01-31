@@ -4,31 +4,26 @@ namespace StringUtils{
 
 std::string Slice(const std::string &str, ssize_t start, ssize_t end) noexcept {
 
-    // if start negative, set to 0
+    //if start negative, set to 0
     if(start < 0){
         start = 0;
     }
-    // if end < 0, set to string length
-    if(end > str.length()){
-        end = str.length();
+    //if end < 0
+    if(end < 0){
+        end = 0;
     }
 
-    // if end is greater than string length, set to string length
+    //if end is greater than string length, set to string length
     if(end > str.length()){
         end = str.length();
     }
-    // if start > end or start >= string lenght or end <= 1, return empty string
-    if(start > end || start >= str.length() || end <= 1){
+    //if start >= end or start >= string length, return empty 
+    if(start >= end || start >= str.length()){
         return "";
     }
     
-    std::string ret;
-    // for i from start to end add letter from str to ret
-    for(size_t i = start; i < end; ++i){
-        ret += str[i];
-    }
-    
-    return ret;
+    //return substr. end - start = length of substr
+    return str.substr(start, end - start);
 }
 
 std::string Capitalize(const std::string &str) noexcept {
@@ -50,6 +45,7 @@ std::string Capitalize(const std::string &str) noexcept {
 
     return ret;
 }
+
 
 std::string Upper(const std::string &str) noexcept {
     //check if empty
@@ -179,28 +175,17 @@ std::string Replace(const std::string &str, const std::string &old, const std::s
 
 std::vector<std::string> Split(const std::string &str, const std::string &splt) noexcept {
     std::vector<std::string> ret;
-    size_t start = 0;
-    
-    for(size_t i = 0; i <= str.length(); ++i){
-        bool match = true;
+    size_t left = 0;
+    // index of first splt
+    size_t right = str.find(splt);
 
-        for(size_t j = 0; j < splt.length(); ++j){
-            //if offset greater than string length or letter doesn't match -> break
-            if(i + j >= str.length() || str[i + j] != splt[j]){
-                match = false;
-                break;
-            }
-        }
-        if (match == true || i == str.length()){
-            //add string to ret vector
-            ret.push_back(std::string(str.begin() + start, str.begin() + i));
-
-            //update start to after word added to ret
-            start = i + splt.length();
-            //update i to after word added to ret. -1 bc i will increment in the loop
-            i += splt.length() - 1;
-        }
+    while(right < str.length()){
+        ret.push_back(str.substr(left, right - left));
+        left = right + splt.length();
+        right = str.find(splt, left);
     }
+
+    ret.push_back(str.substr(left, right - left));
     return ret;
 }
 
@@ -222,23 +207,19 @@ std::string Join(const std::string &str, const std::vector<std::string> &vect) n
 }
 
 std::string ExpandTabs(const std::string &str, int tabsize) noexcept {
+    //splits string by tab in vector
+    std::vector<std::string> v = Split(str, "\t");
     std::string ret;
-    
-    //go through each letter in str
-    for(size_t i = 0; i < str.length(); ++i){
 
-        //if letter is tab
-        if(str[i] == '\t'){
-            //add tabsize many space to ret
+    //goes through vector and appends to string
+    for(size_t i = 0; i < v.size(); ++i){
+        ret += v[i];
+        //if not last string, add tabsize many spaces
+        if(i != v.size() - 1){
             ret += std::string(tabsize, ' ');
         }
-
-        else{
-            //add letter to ret
-            ret += str[i];
-        }
     }
-    
+
     return ret;
 }
 
@@ -264,20 +245,19 @@ int EditDistance(const std::string &left, const std::string &right, bool ignorec
     std::vector<int> curr(right.length() + 1, 0);
 
     //initialize prev
-    for(size_t i = 0; i <= right.length(); ++i){
+    for(size_t i = 0; i <= right.length(); i++){
         prev[i] = i;
     }
 
     //loop through each letter in left. start at 1 to left length
-    for(size_t i = 1; i <= left.length(); ++i){
+    for(size_t i = 1; i <= left.length(); i++){
         
         //sets cost of changing first letter
         curr[0] = i;
 
         //loop through each letter in right. start at 1 to right length
-        for(size_t j = 1; j <= right.length(); ++j){
+        for(size_t j = 1; j <= right.length(); j++){
 
-            
             char a = left[i - 1];
             char b = right[j - 1];
 
@@ -293,25 +273,27 @@ int EditDistance(const std::string &left, const std::string &right, bool ignorec
 
             //if different, find minimum of removing, inserting, or replacing
             else{
-                int rm = prev[j] + 1; //cost remove
-                int ins = curr[j - 1] + 1; //cost insert
-                int rep = prev[j - 1] + 1; //cost replace
+
+                //curr[j] = 1 + min(prev[j], curr[j - 1], curr[j - 1]);
+
+                int rm = prev[j]; //cost remove
+                int ins = curr[j - 1]; //cost insert
+                int rep = prev[j - 1]; //cost replace
 
                 //find minimum cost and set to curr[j]
                 if(rm <= ins && rm <= rep){
-                    curr[j] = rm;
+                    curr[j] = rm + 1;
                 }
                 if(ins <= rm && ins <= rep){
-                    curr[j] = ins;
+                    curr[j] = ins +1 ;
                 }
                 else{
-                    curr[j] = rep;
+                    curr[j] = rep + 1;
                 }
-
             }
         }
-
-        std::swap(prev, curr);
+        // swap prev and curr
+        prev = curr;
     }
 
     return prev[right.length()];
