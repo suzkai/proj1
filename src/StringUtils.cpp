@@ -285,28 +285,40 @@ std::string ExpandTabs(const std::string &str, int tabsize) noexcept {
 }
 
 int EditDistance(const std::string &left, const std::string &right, bool ignorecase) noexcept {
+    
+    //if strings are the same skip everything
+    if(right == left){
+        return 0;
+    }
 
+    //if one empty return length of other
+    if(left.length() == 0){
+        return right.length();
+    }
+    if(right.length() == 0){
+        return left.length();
+    }
 
     //vector of 0s length of word + 1 for empty
     //ex. "kai" -> 4
     // "", "k", "ka", "kai"
-    std::vector<int> prev(right.length() + 1, 0);
-    std::vector<int> curr(right.length() + 1, 0);
-
-    //initialize prev
+    std::vector<int> v(right.length() + 1, 0);
     for(size_t i = 0; i <= right.length(); i++){
-        prev[i] = i;
+        v[i] = i;
     }
+    
 
     //loop through each letter in left. start at 1 to left length
     for(size_t i = 1; i <= left.length(); i++){
         
         //sets cost of changing first letter
-        curr[0] = i;
+        int prev = v[0];
+        v[0] = i;
 
         //loop through each letter in right. start at 1 to right length
         for(size_t j = 1; j <= right.length(); j++){
 
+            int tmp = v[j];
             char a = left[i - 1];
             char b = right[j - 1];
 
@@ -317,33 +329,18 @@ int EditDistance(const std::string &left, const std::string &right, bool ignorec
 
             //if letters are the same, value of prev[j - 1] used
             if(a == b){
-                curr[j] = prev[j - 1];
+                v[j] = prev;
             }
 
             //if different, find minimum of removing, inserting, or replacing
             else{
-
-                int rm = prev[j]; //cost remove
-                int ins = curr[j - 1]; //cost insert
-                int rep = prev[j - 1]; //cost replace
-
-                //find minimum cost and set to curr[j]
-                if(rm <= ins && rm <= rep){
-                    curr[j] = rm + 1;
-                }
-                if(ins <= rm && ins <= rep){
-                    curr[j] = ins +1 ;
-                }
-                else{
-                    curr[j] = rep + 1;
-                }
+                v[j] = std::min(std::min(v[j - 1], v[j]), prev) + 1;
             }
+            prev = tmp;
         }
-        // swap prev and curr
-        prev = curr;
     }
 
-    return prev[right.length()];
+    return v[right.length()];
     }
 }
 
