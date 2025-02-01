@@ -285,19 +285,7 @@ std::string ExpandTabs(const std::string &str, int tabsize) noexcept {
 }
 
 int EditDistance(const std::string &left, const std::string &right, bool ignorecase) noexcept {
-    
-    //if strings are the same skip everything
-    if(right == left){
-        return 0;
-    }
 
-    //if one empty return length of other
-    if(left.length() == 0){
-        return right.length();
-    }
-    if(right.length() == 0){
-        return left.length();
-    }
 
     //vector of 0s length of word + 1 for empty
     //ex. "kai" -> 4
@@ -334,8 +322,6 @@ int EditDistance(const std::string &left, const std::string &right, bool ignorec
 
             //if different, find minimum of removing, inserting, or replacing
             else{
-
-                //curr[j] = 1 + min(prev[j], curr[j - 1], curr[j - 1]);
 
                 int rm = prev[j]; //cost remove
                 int ins = curr[j - 1]; //cost insert
