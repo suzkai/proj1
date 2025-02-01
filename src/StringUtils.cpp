@@ -259,7 +259,7 @@ std::string ExpandTabs(const std::string &str, int tabsize) noexcept {
     int tabstop = 0;
 
     if(tabsize <= 0){
-        return str;
+        tabsize = 0;
     }
 
     //goes through vector and appends to string
