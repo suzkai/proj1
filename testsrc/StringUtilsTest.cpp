@@ -113,6 +113,7 @@ TEST(StringUtilsTest, Join){
 TEST(StringUtilsTest, ExpandTabs){
 	EXPECT_EQ(StringUtils::ExpandTabs("A\tB\tC", 4), "A   B   C");
     EXPECT_EQ(StringUtils::ExpandTabs("A\tB\tC", 8), "A       B       C");
+    EXPECT_EQ(StringUtils::ExpandTabs("12341\t23121", -4), "1234123121");
 }
 
 TEST(StringUtilsTest, EditDistance){

@@ -185,26 +185,55 @@ std::vector<std::string> Split(const std::string &str, const std::string &splt) 
     //to store substrings
     std::vector<std::string> ret;
 
-    //start of substring
-    size_t left = 0;
+    if(splt.empty()){
 
-    //finds index of first splt
-    size_t right = str.find(splt);
+        //split on whitespace
+        size_t left = 0;
+        size_t right = 0;
 
-    //while splt is found
-    while(right != std::string::npos){
-        //add substring to ret
-        ret.push_back(str.substr(left, right - left));
+        //while right is less than string length
+        while(right < str.size()){
+            //skip whitespace at beginning
+            while(right < str.size() && std::isspace(str[right])){
+                ++right;
+            }
 
-        //move to next character after splt found
-        left = right + splt.length();
+            //set start of word
+            left = right;
 
-        //finds next splt
-        right = str.find(splt, left);
+            //find the end of word
+            while(right < str.size() && !std::isspace(str[right])){
+                ++right;
+            }
+            if (left < right) {
+                ret.push_back(str.substr(left, right - left));
+            }
+        }
+    }
+
+    else{
+        //start of substring
+        size_t left = 0;
+
+        //finds index of first splt
+        size_t right = str.find(splt);
+
+        //while splt is found
+        while(right != std::string::npos){
+            //add substring to ret
+            ret.push_back(str.substr(left, right - left));
+
+            //move to next character after splt found
+            left = right + splt.length();
+
+            //finds next splt
+            right = str.find(splt, left);
+        }
+        
+        //add last substring
+        ret.push_back(str.substr(left));
     }
     
-    //add last substring
-    ret.push_back(str.substr(left));
     return ret;
 }
 
@@ -229,21 +258,25 @@ std::string ExpandTabs(const std::string &str, int tabsize) noexcept {
     std::string ret;
     int tabstop = 0;
 
+    if(tabsize <= 0){
+        return str;
+    }
+
     //goes through vector and appends to string
-    for(size_t i = 0; i < str.size(); ++i){
-        char c = str[i];
+    for(char c : str){
+        //if tab then calculate spaces
         if(c == '\t'){
+            // calculate spaces
            int spaces = tabsize - (tabstop % tabsize);
-           ret += std::string(spaces, ' ');
+           ret.append(spaces, ' ');
            tabstop += spaces; 
         }
 
         else{
-            ret += c;
+            ret.push_back(c);
             tabstop++;
         }
     }
-
     return ret;
 }
 
@@ -323,4 +356,5 @@ int EditDistance(const std::string &left, const std::string &right, bool ignorec
     return prev[right.length()];
     }
 }
+
 
